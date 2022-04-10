@@ -1,0 +1,188 @@
+____________________________________________________________
+Question 1:
+
+Create a new tab to enter the following query and explain what it does and the results you get:
+CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }
+This is a good way to familiarize yourself with the data
+
+ANSWER:
+This gives a graph representation of the data
+____________________________________________________________
+
+
+Question 2:
+
+Create a new tab to enter the following query:
+
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+select * where { ?x a ?t . filter(strstarts(?t, h:)) }
+
+Translate this query in plain English.
+Run this query. How many answers do you get?
+Find John and his types.
+
+ANSWER:
+Take all the rows that starts with prefix h.
+
+____________________________________________________________
+Question 3:
+
+In the previous answer, locate the URI of John.
+1. formulate a SELECT query to find all the properties of John
+2. request a description of John using the SPARQL clause for this.
+
+ANSWER-1:
+select * where { ?x a ?t . filter(strends(?x, "John")) }
+
+ANSWER-2:
+prefix p: <http://www.inria.fr/2007/09/11/humans.rdfs-instances#>
+describe p:John where { ?x ?y ?t . }
+
+____________________________________________________________
+
+Question 4:
+
+Create a new tab to enter the following query:
+
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+select * where { ?x h:hasSpouse ?y }
+
+Translate this query in plain English.
+Run this query. How many answers do you get?
+
+ANSWER:
+Give me everyone who has spouse and give their spouse.
+6 answers
+____________________________________________________________
+
+Question 5:
+In the RDF file, find the name of the property that is used to give the shoe size of a person.
+
+1. Deduce a query to extract all the persons (h:Person) with their shoe size.
+
+ANSWER:
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+
+select * 
+where { ?x a h:Person
+	?x h:shoesize ?y }
+
+
+2. Change this query to retrieve all persons and, if available, their shoe size.
+
+ANSWER:
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+
+select * 
+where { ?x a h:Person
+	OPTIONAL {?x h:shoesize ?y }
+
+}
+
+
+3. Change this query to retrieve all persons whose shoesize is greater than 8 or whose shirt size is greater than 12.
+
+ANSWER:
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+
+select * 
+where { ?x a h:Person
+	
+	{?x h:shoesize ?shoesizee.
+	FILTER(?shoesizee > 8) }
+	UNION
+       {?x h:shirtsize ?shirtsizee.
+	FILTER(?shirtsizee>12) }
+	
+
+}
+____________________________________________________________
+
+Question 6:
+In the RDF file, find the name of the property that is used to indicate the children of a person.
+
+1. Formulate a query to find the parents who have at least one child.
+How many answers do you get? How many duplicates do you identify in these responses?
+
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+
+select ?name ?child
+where { ?x h:name ?name.
+	?x h:hasChild ?child.
+
+}
+- 5 answers, 2 dublicates because Gaston has 2 children.
+
+2. Find a way to avoid duplicates.
+How many answers do you get then?
+
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+
+select distinct ?x
+where { ?x h:name ?name.
+	?x h:hasChild ?child.
+
+}
+
+
+
+3. Rewrite a query to find the Persons who have no child.
+
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+
+select ?name 
+
+where {  ?x a h:Person
+	?x h:name ?name.
+	minus {?x h:hasChild ?child.}
+
+}
+
+____________________________________________________________
+Question 7:
+
+In the RDF file, find the name of the property that is used to give the age of a person. #age
+1. Formulate a query to find people who are not adults.
+How many answers do you get?
+
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+
+select ?name 
+
+where {  
+	?x h:name ?name.
+	?x h:age ?age.
+	filter(?age <18)
+
+}
+
+
+2. Use the appropriate query clause to check if Mark is an adult; use the proper clause
+statement for this type of query to get a true or false answer.
+
+
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+ 
+	ask{
+	?x h:name "Mark".
+	?x h:age ?age
+filter(xsd:integer(?age) >18)}
+
+3. Write a query that indicates for each person if her age is even (true or false).
+
+prefix h: <http://www.inria.fr/2007/09/11/humans.rdfs#>
+prefix p: <http://www.inria.fr/2007/09/11/humans.rdfs-instances#>
+
+select *
+where{
+?pers h:age ?age
+bind (xsd:integer(?age/2) = xsd:integer(?age)/2 as ?ageEven)
+}
+
+
+
+
+
+
+
+
