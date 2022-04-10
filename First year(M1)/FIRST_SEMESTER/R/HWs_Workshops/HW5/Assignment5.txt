@@ -1,0 +1,3 @@
+To apply one supervised and one non-supervised model on a dataset at your choice. Please do not use the very same dataset presented during class for the model you wanna use, i.e. if you wanna try DT, do not use the titanic dataset because it's the one used in class, but you can use adult from datasets folder or mtcars from R or whatever other dataset you'll like...
+Please create a markdown report.
+Feature engineering and model performances should be included as well.

@@ -1,0 +1,170 @@
+---
+title: "Assignment-5 report"
+author: "Ufuk Cem Birbiri"
+date: "11/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1.Supervised model
+#### 1.1 Dataset
+I used Glass dataset that is a data frame with 214 observation containing examples of the chemical analysis of <b>7 different types of glass</b>. The problem is to forecast the type of class on basis of the chemical analysis. The study of classification of types of glass was motivated by criminological investigation. At the scene of the crime, the glass left can be used as evidence (if it is correctly identified!)
+
+First we import some libraries.
+```{r libs, include = TRUE, warning = FALSE, message = FALSE}
+library(readr)
+library(datasets)
+library(dplyr)
+library(tidyverse)
+library(mlbench)
+library(caret)
+library(doMC)
+library(corrplot)
+library(knitr)
+set.seed(71)
+```
+Then load the Glass dataset.
+
+```{r include=TRUE}
+
+data("Glass")
+dim(Glass)
+```
+There are 214 samples in the dataset and 10 features. Let's see the faetures.
+```{r include=TRUE}
+
+kable(head(Glass,5))
+```
+It would be better to shuffle the dataset because the "Type" feature is ordered.
+```{r include=TRUE}
+shuffle_index <- sample(1:nrow(Glass))
+Glass <- Glass[shuffle_index, ] 
+kable(head(Glass,5))
+```
+
+The "Type" would be our class label. Let's see them:
+```{r include=TRUE}
+unique(Glass$Type)
+```
+Distribution of class variable:
+```{r echo=FALSE}
+y <- Glass$Type
+cb <- cbind(freq=table(y), percentage=prop.table(table(y))*100)
+par(mar=c(10, 10, 3, 0))
+barplot(table(y), main = "Frequency Distribution of All Classes",
+        xlab = "Class Name",
+        ylab = "Number of Data Points", col="skyblue")
+```
+
+List the types of features:
+```{r include=TRUE}
+sapply(Glass, class)
+```
+Show the mean of each feature:
+```{r include=TRUE}
+sapply(Glass[,1:9], mean)
+```
+Show the standard deviation of each feature:
+```{r include=TRUE}
+sapply(Glass[,1:9], sd)
+```
+
+
+
+Now let's visualize the correlation matrix of each feature:
+```{r echo=FALSE}
+# calculate a correlation matrix for numeric variables
+correlations <- cor(Glass[,1:9])
+corrplot(correlations, method = "circle")
+
+```
+Positive correlations are displayed in blue and negative
+correlations in red color. Color intensity and the size of
+the circle are proportional to the correlation coefficients.
+**We can easily see that Ca is highly correlated with RI**. So we can
+remove one of those from our analysis.
+
+Let's prepare our dataset for training and remove the **RI** :
+```{r include=TRUE}
+x <- Glass[,2:9]
+y <- Glass[,10]
+```
+Let's see our new datasets:
+```{r include=TRUE}
+kable(head(x,3))
+```
+
+#### 1.2 SVM model
+
+Run algorithms using 10-fold cross validation:
+```{r include=TRUE}
+
+control <- trainControl(method="repeatedcv", number=10, repeats=3)
+
+```
+Define the SVMRadial that is used for non-linear classification. Also make a grid search for C parameter. In SVM, C is a regularization parameter that controls the trade off between the achieving a low training error and a low testing error that is the ability to generalize your classifier to unseen data.Smaller C leads to more margin violations but wider margin.
+
+```{r include=TRUE}
+grid <- expand.grid(.sigma=c(0.01,0.05,0.1,0.5,1,10), .C=c(1))
+fit.svm <- train(Type~., data=Glass, method="svmRadial", 
+                 metric="Accuracy", tuneGrid=grid, 
+                 trControl=control)
+results <- list(SVM=fit.svm)
+results
+```
+As we can see, the best result is 0.707 with C = 0.10.
+
+Now let's see the confusion matrix:
+```{r include=TRUE}
+confusionMatrix(fit.svm)
+```
+Since this is a multi-class classification problem, it is a bit hard to detect FP,TP,FN,TN.
+
+### 2.Unsupervised models: Dimension Reduction
+#### 2.1 t-SNE
+We use iris dataset for dimension reduction. Loading the iris dataset into a object called IR.
+
+```{r include=TRUE}
+IR<-data("iris")
+IR <- iris
+```
+Split IR into two objects: 1) containing measurements 2) containing species type:
+```{r include=TRUE}
+IR_data <- IR[ ,1:4]
+IR_species <- IR[ ,5]
+```
+
+Load the t-SNE library
+
+```{r include = TRUE, warning = FALSE, message = FALSE}
+library(Rtsne)
+```
+
+Run the t-SNE algorithm and store the results into an object called tsne_results:
+```{r include=TRUE}
+tsne_results <- Rtsne(IR_data, perplexity=30, check_duplicates = FALSE) # You can change the value of perplexity and see how the plot changes
+
+```
+Generate the t_SNE plot
+```{r include=TRUE}
+plot(tsne_results$Y, col = "black", bg= IR_species, pch = 21, cex = 1.5)
+
+```
+
+#### 2.2 PCA
+To plot PCA, first we need to import following library:
+
+```{r include = TRUE, warning = FALSE, message = FALSE}
+library(ggfortify)
+```
+Now, visualize the PCA:
+```{r include=TRUE}
+
+pca_res <- prcomp(IR_data, scale. = TRUE)
+autoplot(pca_res, data = iris, colour = 'Species', label = FALSE, label.size = 3)
+
+```
+Since the iris dataset is not very complex and does not have many dimensions, it seems that both PCA and t-SNE works well.

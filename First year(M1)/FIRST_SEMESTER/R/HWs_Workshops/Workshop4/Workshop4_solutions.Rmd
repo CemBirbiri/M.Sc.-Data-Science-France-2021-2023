@@ -1,0 +1,201 @@
+---
+title: "Workshop4"
+author: "Giulia Marchello"
+date: "11/16/2020"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Exercise 1
+### Download the dataset : [winequality-red.csv](https://archive.ics.uci.edu/ml/datasets/wine+quality) and show the summary.
+```{r}
+
+redwine<- read.csv("winequality-red.csv", sep=";", header = TRUE)
+summary(redwine)
+
+```
+
+
+
+### Add the categorical variable "label" grouping the alcohol variable in the following way: 
+Light:  alcohol $<$ 9; Medium: 9 $\leq$ alcohol $<$ 12 ; Strong: alcohol $\geq$ 12  
+
+### How many Light, Medium and Strong wines there are in the dataset?
+
+```{r}
+library(ggplot2)
+redwine$label[redwine$alcohol<9] ='Light'
+redwine$label[9<=redwine$alcohol & redwine$alcohol<12]='Medium'
+redwine$label[12<=redwine$alcohol]='Strong'
+redwine$label=as.factor(redwine$label)
+table(redwine$label)
+
+```
+
+### Create a barplot of the 3 levels variable "label" where the color of bars depends on the level of the alcohol concentration, with title: "Alcohol concentration" 
+```{r}
+ggplot(redwine, aes(x=label))+ geom_bar(aes(fill = label))+ labs(title = "Alcohol concentration")
+```
+ 
+
+### Show histograms for fixed.acidity by label
+```{r}
+ggplot(data = redwine, aes(x = fixed.acidity)) +
+  geom_histogram(binwidth = 0.2, color = 'black', fill = '#099DD9') +
+  # Split data by category and display plots horizontally
+  facet_wrap(~label)
+```
+
+### Create a density plot (`geom_density()`) showing the citric.acid of the three level of the variable "label"
+```{r}
+ggplot(redwine, aes(citric.acid)) +
+   geom_density(aes(fill = label), alpha = 0.8)
+```
+
+### Create a scatter plot quality and alcohol where the color of points varies depending on the following quality ranges $(2,4], (4,6], (6,8]$. Add a dashed line for the median. Give a title to the plot and to the x and y axes
+Use `geom_jitter()` instead of `geom_point()`
+```{r}
+quality.range <- cut(redwine$quality, breaks = c(2, 4, 6, 8), right = T)
+
+ggplot(aes(x = quality, y = alcohol), data = redwine) +
+  geom_jitter(aes(color = quality.range), alpha=0.6) +
+   stat_summary(fun=median, geom = "line", linetype=2) +
+    xlab("Quality score") +
+  ylab("Alcohol content (% by volume)") +
+  ggtitle("Quality vs. amount of alcohol in red wines")
+```
+
+# Exercise 2 - Dplyr recap
+`libarry(tidyverse)`
+`library(dplyr)`
+`library(gapminder)`
+
+### Load the dataset gapminder from the package gapminder
+```{r}
+library(tidyverse)
+library(dplyr)
+library(gapminder)
+my_gap = gapminder
+
+```
+### Create a tibble $5 \times 4$ containing the number of observation per continent, the number of countries per continent and the average of life expectation.
+```{r}
+my_gap %>%
+  group_by(continent) %>%
+  summarize(n = n(), n_countries = n_distinct(country),
+            avg_lifeExp = round(mean(lifeExp),1))
+
+
+```
+
+
+### What was the most populous European country in 1992?
+#### Modify the population variable by dividing it by $10^6$. Show the results sorted according to population in a descendent order.
+```{r}
+ gapminder %>%
+  mutate(pop = pop / 1e+06) %>%
+filter(year == 1992, continent == 'Europe') %>% arrange(desc(pop))
+```
+
+### Draw a scatterplot of gdpPercap and lifeExp where the color of points depends on the continent. Overall also a smooth line (*loess*) with it's confidence intervals. Give the plot a title and axis labels.
+
+Hint: log scale x axis
+```{r}
+ggplot(my_gap, aes(gdpPercap, lifeExp)) + scale_x_log10() + 
+  geom_point( aes(color = continent),alpha = 0.5) + 
+  geom_smooth(method = "loess", se=T, lwd=1) +
+  ggtitle("Life expectancy vs GDP by Continent") +
+  xlab("GDP Per Capita (USD)") + ylab("Life Expectancy (years)")
+  
+```
+
+# Exercise 3
+
+
+## Instructions:
+Select a dataset and variables to be used for clustering: 
+- Iris dataset, variable Species not included.
+- mtcars dataset, considering only the following variables : 'mpg','disp', 'wt'.
+Indicate the desired number of clusters to be used and display the results in a scatterplot where colors depend on clusters.
+
+Hint : add `runtime: shiny` to the YAML-Header.
+
+### Example :
+![Example Image](ShinyAppExample.png) 
+
+       
+```{r, echo = FALSE}
+
+library(shiny)
+library(ggplot2)
+
+# Define UI for application that draws a histogram
+ui <- pageWithSidebar(
+    headerPanel('K-means clustering example'),
+    sidebarPanel(
+        selectInput('dataset','Select a dataset:',c("iris","mtcars")),
+        uiOutput("varselect1"),
+        uiOutput("varselect2"),
+        
+        numericInput('k', 'Number of clusters', value = 3, min =1,step=0.5)
+    ),
+    mainPanel(
+        
+        plotOutput('plot1')
+    )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+
+    output$varselect1 = renderUI({
+        selectInput("var1", label = "Select first variable for clustering:",
+                    choices = names(dataset()), selected = names(dataset())[1])
+    })
+    
+    output$varselect2 = renderUI({
+        selectInput("var2", label = "Select second variable for clustering:",
+                    choices = names(dataset()), selected = names(dataset())[2])
+    })
+    # Combine the selected variables into a new data frame
+    dataset <- reactive({
+        if (input$dataset=="iris") {
+            data(iris)
+            iris[,-5]
+        } else if (input$dataset=="mtcars") {
+           data(mtcars) 
+            mtcars[, c('mpg','disp', 'wt')]
+        } else data.frame()
+    })
+    
+
+    compute <- reactive({
+        
+        data   <- subset(dataset(), select=c(input$var1,input$var2))
+        colnames(data) <- c("x","y")
+        
+        if(input$k>nrow(unique(data))) updateNumericInput(session,"k", value = nrow(unique(data)))
+
+            Kclust <- kmeans(data ,input$k)
+            list(kmean.result = data.frame(data, cluster=as.factor(Kclust$cluster)),
+                 centers = as.data.frame(Kclust$centers))
+        })
+    
+    output$plot1 <- renderPlot({
+        data=compute()
+        ggplot(data=data$kmean.result) +
+            geom_point(aes(x=x, y=y, color=cluster),size=3, pch =17) + geom_point(data=data$centers,
+                                            aes(x=x, y=y, color="Centers"), pch=17, size=7) +
+            ggtitle("Clustering result") + xlab(input$var1) + ylab(input$var2)
+    })
+}    
+ 
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 1000))
+
+```
+

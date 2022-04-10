@@ -1,0 +1,126 @@
+---
+title: "Ufuk Cem Birbiri's resume"
+author: Ufuk Cem Birbiri
+date: "`r Sys.Date()`"
+output:
+  pagedown::html_resume:
+    # set it to true for a self-contained HTML page but it'll take longer to render
+    self_contained: true
+# uncomment this line to produce HTML and PDF in RStudio:
+#knit: pagedown::chrome_print
+---
+
+Aside
+================================================================================
+
+Contact Info {#contact}
+--------------------------------------------------------------------------------
+
+- <i class="fa fa-envelope"></i> uccbirbiri@gmail.com
+- <i class="fa fa-github"></i> [github.com/CemBirbiri](https://github.com/CemBirbiri)
+- <i class="fa fa-phone"></i> +33 (0)6 29 25 78 49
+- For more information, please contact me via email.
+
+
+Skills {#skills}
+--------------------------------------------------------------------------------
+
+- Experienced in Generative Adversarial Networks, deep learning networks, R and Shiny.
+
+- Data analysis with R and Python
+
+-  <b>Technical Skills:</b> Python, R, C/C++, Haskell, Prolog, x86-64 Assembly, Verilog, Linux
+- <b>Languages:</b> English, Turkish
+- <b>Interests:</b> Juggling and climbing
+
+Disclaimer {#disclaimer}
+--------------------------------------------------------------------------------
+
+
+
+Last updated on `r Sys.Date()`.
+
+
+
+Main
+================================================================================
+
+Ufuk Cem Birbiri {#title}
+--------------------------------------------------------------------------------
+
+
+Education {data-icon=graduation-cap data-concise=true}
+--------------------------------------------------------------------------------
+
+### Middle East Technical University
+
+B.Sc. in Computer Engineering
+
+Ankara, Turkey
+
+2015 - 2021
+
+Bachelor Thesis Project: Protein Function Prediction with Deep Learning
+
+### Université Côte d'Azur
+
+M.Sc. in Data Science & Artificial Intelligence
+
+Nice, France
+
+2021 - present
+
+
+
+Research Experience {data-icon=laptop}
+--------------------------------------------------------------------------------
+
+### Internship
+Aberystwyth University, Vision Graphics and Visualization Group
+
+Wales, UK
+
+2019
+
+- Computer aided diagnosis of prostate cancer.
+- Detection and segmentation of the prostate on multi-parametric MRIs using deep learning.
+- Development of the deep learning algorithms
+- Data augmentation techniques on medical images
+
+### Internship
+
+Netherlands Cancer Institute, Oncogenomics Group.
+
+Amsterdam, Netherlands
+
+2020
+
+- Development of computer aided analysis of ribosome profiling data of melanoma cancer cells.
+- Classification of RNA-fold and disorderedness levels using machine learning.
+
+Publications and Projects {data-icon=file}
+--------------------------------------------------------------------------------
+
+### Investigating the Performance of Generative Adversarial Networks for Prostate Tissue Detection and Segmentation
+
+Journal of Imaging 6.9 (2020): 83.
+
+N/A
+
+2020
+
+
+**Cem Birbiri**, U., Hamidinekoo, A., Grall, A., Malcolm, P., & Zwiggelaar, R.
+
+### DeepRed++: Protein Function Prediction with Deep Learning
+N/A
+
+N/A
+
+2021 - present
+
+- Development of the [DeepRed](https://www.nature.com/articles/s41598-019-43708-3) algorithm(DeepRed++) using on [Uniprot](https://www.uniprot.org) protein data
+- Building a website where users can enter protein fasta files and obtain Gene Ontology (GO) term annotation predictions using DeepRed++ model.
+
+
+
