@@ -1,0 +1,25 @@
+Hello,
+
+Here is the important things to know:
+
+
+
+- The project is implemented in a Google Colab Notebook. 
+- I upload the data from Google Drive and save to there. I used the following path for the data folder:
+
+	'/content/drive/MyDrive/Geometric_methods_PROJECT/schic/processed/..'
+
+	I think you can access the same data folder in your local using this path:
+
+	'/schic/processed/..'
+
+- The - The zip file contains the Colab notebook and SCC_results.txt. 
+	SCC_results.txt contains the SCC scores calculated between the Hi-C contact maps. 
+- Each section is explained in a detailed way in the Notebook. Please let me know if you have any questions: ufuk-cem.birbiri@etu.univ-cotedazur.fr
+
+ Thank you and have fun!
+
+ Ufuk Cem Birbiri
+ Data Science & AI MSc - M2
+
+
